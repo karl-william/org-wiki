@@ -59,7 +59,7 @@
   :group 'tools
   )
 
-(defcustom org-wiki-location-list '("~/org/wiki")
+(defcustom org-wiki-location-list '("~/Org/wik")
   "List of org-wiki root directories"
   :type  '(repeat directory)
   :group 'org-wiki
@@ -85,17 +85,17 @@ You can toggle read-only mode with M-x read-only-mode or C-x C-q."
 
 ;;; =======  Python Webserver Settings =========== ;;
 
-(defcustom org-wiki-server-port "8000"
-  "Default port to server org-wiki static files server."
-  :type  'string
-  :group 'org-wiki
-  )
-
-(defcustom org-wiki-server-host "0.0.0.0"
-  "Default address that the server listens to."
-  :type  'string
-  :group 'org-wiki
-  )
+;; (defcustom org-wiki-server-port "8000"
+  ;; "Default port to server org-wiki static files server."
+  ;; :type  'string
+  ;; :group 'org-wiki
+  ;; )
+;;
+;; (defcustom org-wiki-server-host "0.0.0.0"
+  ;; "Default address that the server listens to."
+  ;; :type  'string
+  ;; :group 'org-wiki
+  ;; )
 
 ;; ======== Async export settings ================ ;;
 
@@ -117,18 +117,18 @@ You can toggle read-only mode with M-x read-only-mode or C-x C-q."
 
 
 ;; ====== Optional Clip.jar image pasting app =========== ;;
-(defcustom org-wiki-backup-location nil
-  "Path to backup directory."
-  :type 'directory
-  :group 'org-wiki
-  )
-
-;; Optional Clip.jar image pasting app
-(defcustom org-wiki-clip-jar-path "~/bin/Clip.jar"
-  "Path to Clip.jar utility to paste images from clipboard."
-  :type 'file
-  :group 'org-wiki 
-  )
+;; (defcustom org-wiki-backup-location nil
+  ;; "Path to backup directory."
+  ;; :type 'directory
+  ;; :group 'org-wiki
+  ;; )
+;;
+;; ;; Optional Clip.jar image pasting app
+;; (defcustom org-wiki-clip-jar-path "~/bin/Clip.jar"
+  ;; "Path to Clip.jar utility to paste images from clipboard."
+  ;; :type 'file
+  ;; :group 'org-wiki
+  ;; )
 
 
 
@@ -145,14 +145,15 @@ You can toggle read-only mode with M-x read-only-mode or C-x C-q."
 
 
 (defcustom org-wiki-template
-  (concat "#+TITLE: %n\n"
-          "#+DESCRIPTION:\n"
-          "#+KEYWORDS:\n"
-          "#+STARTUP:  content\n"
-          "\n\n"
-          "- [[wiki:index][Index]]\n\n"
-          "- Related: \n\n"
-          "* %n\n"
+  (concat "[[wiki:index][Index]]\n\n"
+          "#+TITLE: %n\n"
+          "#+AUTHOR:"
+          ;; "#+DESCRIPTION:\n"
+          ;; "#+KEYWORDS:\n"
+          ;; "#+STARTUP:  content\n"
+          ;; "\n\n"
+          ;; "- Related: \n\n"
+          ;; "* %n\n"
           )
   "Default template used to create org-wiki pages/files.
 - %n - is replaced by the page name.
@@ -239,28 +240,28 @@ ELISP> (org-wiki--page->file \"Linux\")
   "Get current org-wiki page's name bound to current buffer."
   (org-wiki--file->page (buffer-file-name)))
 
-(defun org-wiki--current-page-asset-dir ()
-  "Get current org-wiki page's asset directory"
-  (interactive)
-  (concat (file-name-as-directory org-wiki-location)
-          (file-name-base (buffer-file-name))))
-
-(defun org-wiki--current-page-asset-file (filename)
-  "Get current page's asset file path given its name.
-Example: If the current page is 'Smalltalk programming'
-
-ELISP> (org-wiki--current-page-asset-file \"manual.pdf\")
-\"Smalltalk programming/manual.pdf\"
-ELISP>"
-  (concat (file-name-as-directory (file-name-base (buffer-file-name)))
-          filename))
-
-(defun org-wiki--buffer-file-in-wiki-p ()
-  "Return true if current buffer file name is inside wiki directory."
-  (file-exists-p
-   (org-wiki--concat-path
-    org-wiki-location
-    (file-name-nondirectory (buffer-file-name)))))
+;; (defun org-wiki--current-page-asset-dir ()
+  ;; "Get current org-wiki page's asset directory"
+  ;; (interactive)
+  ;; (concat (file-name-as-directory org-wiki-location)
+          ;; (file-name-base (buffer-file-name))))
+;;
+;; (defun org-wiki--current-page-asset-file (filename)
+  ;; "Get current page's asset file path given its name.
+;; Example: If the current page is 'Smalltalk programming'
+;;
+;; ELISP> (org-wiki--current-page-asset-file \"manual.pdf\")
+;; \"Smalltalk programming/manual.pdf\"
+;; ELISP>"
+  ;; (concat (file-name-as-directory (file-name-base (buffer-file-name)))
+          ;; filename))
+;;
+;; (defun org-wiki--buffer-file-in-wiki-p ()
+  ;; "Return true if current buffer file name is inside wiki directory."
+  ;; (file-exists-p
+   ;; (org-wiki--concat-path
+    ;; org-wiki-location
+    ;; (file-name-nondirectory (buffer-file-name)))))
 
 (defun org-wiki--list-pages ()
   "Return a list containing all pages files *.org."
@@ -313,40 +314,40 @@ Example: '(\"Linux\" \"BSD\" \"Bash\"  \"Binary_Files\")"
 ;;                      (concat wikipage ".org")))))
 
 
-(defun org-wiki--assets-get-dir (pagename)
-  "Get path to asset directory of given PAGENAME."
-  (org-wiki--concat-path org-wiki-location pagename))
-
-
-(defun org-wiki--assets-make-dir (pagename)
-  "Create the asset directory of a wiki page (PAGENAME) if it doesn't exist.
-Example: (org-wiki--assets-make-dir \"Bash\")
-
-It will crate the directory ~/wiki-location/Bash/
-corresponding to the file ~/wiki-location/Bash.org
-if it doesn't exist yet."
-  (let ((assets-dir (org-wiki--assets-get-dir pagename)))
-    (if (not (file-exists-p assets-dir))
-        (make-directory assets-dir t))))
-
-
-(defun org-wiki--assets-buffer-make-dir ()
-  "Create asset directory of current buffer page if it doesn't exit."
-  (if (org-wiki--buffer-file-in-wiki-p)
-      (progn
-        (org-wiki--assets-make-dir
-         (file-name-base (buffer-file-name))))
-    (message "Error: Not in a wiki page.")))
-
-
-(defun org-wiki--is-buffer-in (b)
-  "Check if buffer is an org-wiki buffer.
-It returns true (non nil) if buffer directory is a subdirectory of
-org-wiki-location."
-  (string-prefix-p
-   (expand-file-name org-wiki-location)
-   (expand-file-name (with-current-buffer b
-                       default-directory))))
+;; (defun org-wiki--assets-get-dir (pagename)
+  ;; "Get path to asset directory of given PAGENAME."
+  ;; (org-wiki--concat-path org-wiki-location pagename))
+;;
+;;
+;; (defun org-wiki--assets-make-dir (pagename)
+  ;; "Create the asset directory of a wiki page (PAGENAME) if it doesn't exist.
+;; Example: (org-wiki--assets-make-dir \"Bash\")
+;;
+;; It will crate the directory ~/wiki-location/Bash/
+;; corresponding to the file ~/wiki-location/Bash.org
+;; if it doesn't exist yet."
+  ;; (let ((assets-dir (org-wiki--assets-get-dir pagename)))
+    ;; (if (not (file-exists-p assets-dir))
+        ;; (make-directory assets-dir t))))
+;;
+;;
+;; (defun org-wiki--assets-buffer-make-dir ()
+  ;; "Create asset directory of current buffer page if it doesn't exit."
+  ;; (if (org-wiki--buffer-file-in-wiki-p)
+      ;; (progn
+        ;; (org-wiki--assets-make-dir
+         ;; (file-name-base (buffer-file-name))))
+    ;; (message "Error: Not in a wiki page.")))
+;;
+;;
+;; (defun org-wiki--is-buffer-in (b)
+  ;; "Check if buffer is an org-wiki buffer.
+;; It returns true (non nil) if buffer directory is a subdirectory of
+;; org-wiki-location."
+  ;; (string-prefix-p
+   ;; (expand-file-name org-wiki-location)
+   ;; (expand-file-name (with-current-buffer b
+                       ;; default-directory))))
 
 ;;=============== Org-mode custom protocol ===============;;
 ;;
@@ -393,16 +394,16 @@ Will open the the wiki file Linux.org in
         ))) 
 
 
-(defun org-wiki--assets-get-file (pagename filename)
-  "Return a path to an asset file FILENAME in given PAGENAME."
-  (org-wiki--concat-path (org-wiki--assets-get-dir pagename) filename))
-
-(defun org-wiki--assets-open-file-emacs (pagename filename)
-  "Open an asset file FILENAME of a PAGENAME with Emacs.
-
-Example: (org-wiki--assets-open-file-emacs \"Python\" \"example1.py\")
-It will open the file <wiki path>/Python/example1.py related to the page Python.org."
-  (find-file  (org-wiki--assets-get-file pagename filename)))
+;; (defun org-wiki--assets-get-file (pagename filename)
+  ;; "Return a path to an asset file FILENAME in given PAGENAME."
+  ;; (org-wiki--concat-path (org-wiki--assets-get-dir pagename) filename))
+;;
+;; (defun org-wiki--assets-open-file-emacs (pagename filename)
+  ;; "Open an asset file FILENAME of a PAGENAME with Emacs.
+;;
+;; Example: (org-wiki--assets-open-file-emacs \"Python\" \"example1.py\")
+;; It will open the file <wiki path>/Python/example1.py related to the page Python.org."
+  ;; (find-file  (org-wiki--assets-get-file pagename filename)))
 
 
 (defun org-wiki-xdg-open (filename)
@@ -448,33 +449,33 @@ Running in Mac OSX invokes open"
        ))) ;; End of org-wiki/xdg-open
 
 
-(defun org-wiki--protocol-open-assets-with-sys (link)
-  "Org-mode protocol handler to open an asset with default system app.
-Example: it will turn a hyperlink LINK of syntax Blueprint;box1.dwg that
-points to the file <org wiki location>/Blueprint/box1.dwg."
-
-  (let* ((a     (split-string link ";"))
-        (pagename  (car a))
-        (filename  (cadr a))
-        )
-    (org-wiki-xdg-open
-     (org-wiki--assets-get-file pagename filename))))
-
-
-;;  @DONE: Implement html exporting to org-wiki asset files
+;; (defun org-wiki--protocol-open-assets-with-sys (link)
+  ;; "Org-mode protocol handler to open an asset with default system app.
+;; Example: it will turn a hyperlink LINK of syntax Blueprint;box1.dwg that
+;; points to the file <org wiki location>/Blueprint/box1.dwg."
 ;;
-(defun org-wiki--asset-link (path desc backend)
-  "Creates an html org-wiki pages html exporting."
-  (let* ((a    (split-string path ";"))
-        (page  (car a))
-        (asset (cadr a))
-        (file-path (concat page "/"  asset))
-        )
-   (cl-case backend
-     (html (format
-            "<a href='%s'>%s</a>"
-            file-path
-            (or desc asset))))))
+  ;; (let* ((a     (split-string link ";"))
+        ;; (pagename  (car a))
+        ;; (filename  (cadr a))
+        ;; )
+    ;; (org-wiki-xdg-open
+     ;; (org-wiki--assets-get-file pagename filename))))
+;;
+;;
+;; ;;  @DONE: Implement html exporting to org-wiki asset files
+;; ;;
+;; (defun org-wiki--asset-link (path desc backend)
+  ;; "Creates an html org-wiki pages html exporting."
+  ;; (let* ((a    (split-string path ";"))
+        ;; (page  (car a))
+        ;; (asset (cadr a))
+        ;; (file-path (concat page "/"  asset))
+        ;; )
+   ;; (cl-case backend
+     ;; (html (format
+            ;; "<a href='%s'>%s</a>"
+            ;; file-path
+            ;; (or desc asset))))))
 
 ;;; Custom Protocols
 (add-hook 'org-mode-hook
@@ -501,72 +502,72 @@ points to the file <org wiki location>/Blueprint/box1.dwg."
                       (action . ,callback)
                       ))))
 
+;;
+;; (defun org-wiki--asset-page-files (pagename)
+  ;; "Get all asset files from a given PAGENAME."
+  ;; (org-wiki--assets-make-dir pagename)
+  ;; (directory-files (org-wiki--assets-get-dir pagename)))
+;;
+;;
+;; (defun org-wiki--asset-helm-selection (callback)
+  ;; "Higher order function to deal with page assets.
+;;
+;; org-wiki-asset-helm-selection (CALLBACK)
+;;
+;; This function opens a helm menu to select a wiki page and then
+;; passes the result of selection to a callback function that takes
+;; a asset file as argument.
+;;
+;; Example: If the user selects the file freebsdref1.pdf it inserts the
+;; file name at current point.
+;;
+;; > (org-wiki--asset-helm-selection (lambda (file) (insert file)))
+  ;; freebsdref1.pdf"
+  ;; (helm :sources `((
+                      ;; (name . "Wiki Pages")
+                      ;; (candidates . ,(org-wiki--asset-page-files
+                                      ;; (org-wiki--current-page)))
+                      ;; (action .  (lambda (file)
+                                   ;; (,callback (org-wiki--current-page-asset-file file))
+                                   ;; ))
+                      ;; ))))
 
-(defun org-wiki--asset-page-files (pagename)
-  "Get all asset files from a given PAGENAME."
-  (org-wiki--assets-make-dir pagename)
-  (directory-files (org-wiki--assets-get-dir pagename)))
 
-
-(defun org-wiki--asset-helm-selection (callback)
-  "Higher order function to deal with page assets.
-
-org-wiki-asset-helm-selection (CALLBACK)
-
-This function opens a helm menu to select a wiki page and then
-passes the result of selection to a callback function that takes
-a asset file as argument.
-
-Example: If the user selects the file freebsdref1.pdf it inserts the
-file name at current point.
-
-> (org-wiki--asset-helm-selection (lambda (file) (insert file)))
-  freebsdref1.pdf"
-  (helm :sources `((
-                      (name . "Wiki Pages")
-                      (candidates . ,(org-wiki--asset-page-files
-                                      (org-wiki--current-page)))
-                      (action .  (lambda (file)
-                                   (,callback (org-wiki--current-page-asset-file file))
-                                   ))
-                      ))))
-
-
-(defun org-wiki--asset-download-hof (callback)
-  "Higher order function to download a file.
-Callback is a function with this signature:
- (callback <pagename> <filename>)
-
-How this function works:
-1. Ask the user for the URL suggesting the URL extracted from the clipboard.
-2. Ask the user for the file name to be downloaded suggesting the filename extracted from
-the URL.
-3. Calls the callback function passing the current page name and the file name.
-
-If the URL is: http://www.myurl.com/Manual1.pdf, the current page is Unix and
-the callback function is:
-
-  (lambda (p f) (insert (format \"%s/%s\" p f)))
-
-if the user doesn't change the suggested file name It will insert at current
-point: 'Unix/Manual.pdf'."
-  (let*
-      ((pagename (file-name-base (buffer-file-name)))
-
-       ;; Get the URL suggestion from clibpoard
-       (text (with-temp-buffer
-              (clipboard-yank)
-              (buffer-substring-no-properties (point-min)
-                                              (point-max))))
-       (url (read-string "Url: " text))
-       (default-directory (org-wiki--assets-get-dir pagename))
-
-       (output-file  (read-string "File name: "
-                                  (car  (last (split-string url "/"))))))
-
-    (org-wiki--assets-make-dir pagename)
-    (url-copy-file url output-file)
-    (funcall callback pagename output-file)))
+;; (defun org-wiki--asset-download-hof (callback)
+  ;; "Higher order function to download a file.
+;; Callback is a function with this signature:
+ ;; (callback <pagename> <filename>)
+;;
+;; How this function works:
+;; 1. Ask the user for the URL suggesting the URL extracted from the clipboard.
+;; 2. Ask the user for the file name to be downloaded suggesting the filename extracted from
+;; the URL.
+;; 3. Calls the callback function passing the current page name and the file name.
+;;
+;; If the URL is: http://www.myurl.com/Manual1.pdf, the current page is Unix and
+;; the callback function is:
+;;
+  ;; (lambda (p f) (insert (format \"%s/%s\" p f)))
+;;
+;; if the user doesn't change the suggested file name It will insert at current
+;; point: 'Unix/Manual.pdf'."
+  ;; (let*
+      ;; ((pagename (file-name-base (buffer-file-name)))
+;;
+       ;; ;; Get the URL suggestion from clibpoard
+       ;; (text (with-temp-buffer
+              ;; (clipboard-yank)
+              ;; (buffer-substring-no-properties (point-min)
+                                              ;; (point-max))))
+       ;; (url (read-string "Url: " text))
+       ;; (default-directory (org-wiki--assets-get-dir pagename))
+;;
+       ;; (output-file  (read-string "File name: "
+                                  ;; (car  (last (split-string url "/"))))))
+;;
+    ;; (org-wiki--assets-make-dir pagename)
+    ;; (url-copy-file url output-file)
+    ;; (funcall callback pagename output-file)))
 
 
 ;;************** U S E R -  M-X - C O M M A N D S ********************* ;;;
@@ -631,95 +632,95 @@ point: 'Unix/Manual.pdf'."
   (dired (org-wiki--concat-path org-wiki-location "*.org"))
   (dired-hide-details-mode))
 
-(defun org-wiki-asset-dired ()
-  "Open the asset directory of current wiki page."
-  (interactive)
-  (let ((pagename (file-name-base (buffer-file-name))))
-    (org-wiki--assets-make-dir pagename)
-    (dired (org-wiki--assets-get-dir pagename))))
-
-(defun org-wiki-asset-insert ()
-  "Insert link wiki-asset-sys:<page>;<file> to an asset file of current page..
-It inserts a link of type wiki-asset-sys:<Wiki-page>;<Asset-File>
-Example:  [[wiki-asset-sys:Linux;LinuxManual.pdf]]"
-  (interactive)
-  (org-wiki--asset-helm-selection
-   (lambda (file)
-     (insert (format "[[wiki-asset-sys:%s;%s][%s]]"
-                     (file-name-base (org-wiki--current-page-asset-dir))
-                     (file-name-nondirectory file)
-                     (read-string "Description: " (file-name-nondirectory file))
-                     )))))
-
-(defun org-wiki-asset-insert-file ()
-  "Insert link file:<page>/<file> to asset file of current page at point.
-Use this command to insert link to files that can be opened with
-Emacs like source codes. It will insert a link like this
-- [[file:Python/GpsScript.py][GpsScript.py]]."
-  (interactive)
-  (org-wiki--asset-helm-selection
-    (lambda (file)
-      (save-excursion
-        (insert (org-make-link-string
-                 (concat "file:" file)
-                 (file-name-nondirectory file)
-                 ))))))
-
-
-(defun org-wiki-asset-insert-image ()
-  "Insert link file:<page>/<file> to images asset file at point.
-This command is similar to org-wiki-asset-insert-file but it inserts a link
-in this way: [[file:Linux/logo.png][file:Linux/logo.png/]]."
-  (interactive)
-  (org-wiki--asset-helm-selection
-    (lambda (file)
-      (save-excursion
-        (insert (org-make-link-string
-                 (concat "file:" file)
-                 (concat "file:" file)
-                 ))))))
-
-
-
-(defun org-wiki-asset-insert-block ()
-  "Insert code block with contents of some asset file."
-  (interactive)
-  (org-wiki--asset-helm-selection
-    (lambda (file)
-      (save-excursion
-        (insert (concat " - File: " (org-make-link-string (concat "file:" file))))
-        (insert "\n\n")
-        (insert "#+BEGIN_SRC text\n")
-        (insert "  ")
-        (insert (replace-regexp-in-string
-                 "\n"
-                 "\n  "
-                 (with-temp-buffer
-                   (insert-file-contents file)
-                   (buffer-substring-no-properties (point-min) (point-max)))))
-        (insert "\n#+END_SRC")
-        ))))
+;; (defun org-wiki-asset-dired ()
+  ;; "Open the asset directory of current wiki page."
+  ;; (interactive)
+  ;; (let ((pagename (file-name-base (buffer-file-name))))
+    ;; (org-wiki--assets-make-dir pagename)
+    ;; (dired (org-wiki--assets-get-dir pagename))))
+;;
+;; (defun org-wiki-asset-insert ()
+  ;; "Insert link wiki-asset-sys:<page>;<file> to an asset file of current page..
+;; It inserts a link of type wiki-asset-sys:<Wiki-page>;<Asset-File>
+;; Example:  [[wiki-asset-sys:Linux;LinuxManual.pdf]]"
+  ;; (interactive)
+  ;; (org-wiki--asset-helm-selection
+   ;; (lambda (file)
+     ;; (insert (format "[[wiki-asset-sys:%s;%s][%s]]"
+                     ;; (file-name-base (org-wiki--current-page-asset-dir))
+                     ;; (file-name-nondirectory file)
+                     ;; (read-string "Description: " (file-name-nondirectory file))
+                     ;; )))))
+;;
+;; (defun org-wiki-asset-insert-file ()
+  ;; "Insert link file:<page>/<file> to asset file of current page at point.
+;; Use this command to insert link to files that can be opened with
+;; Emacs like source codes. It will insert a link like this
+;; - [[file:Python/GpsScript.py][GpsScript.py]]."
+  ;; (interactive)
+  ;; (org-wiki--asset-helm-selection
+    ;; (lambda (file)
+      ;; (save-excursion
+        ;; (insert (org-make-link-string
+                 ;; (concat "file:" file)
+                 ;; (file-name-nondirectory file)
+                 ;; ))))))
+;;
+;;
+;; (defun org-wiki-asset-insert-image ()
+  ;; "Insert link file:<page>/<file> to images asset file at point.
+;; This command is similar to org-wiki-asset-insert-file but it inserts a link
+;; in this way: [[file:Linux/logo.png][file:Linux/logo.png/]]."
+  ;; (interactive)
+  ;; (org-wiki--asset-helm-selection
+    ;; (lambda (file)
+      ;; (save-excursion
+        ;; (insert (org-make-link-string
+                 ;; (concat "file:" file)
+                 ;; (concat "file:" file)
+                 ;; ))))))
 
 
-(defun org-wiki-asset-find-file ()
-  "Open a menu to select an asset file of current page and open it with Emacs.
-Note: see 'org-wiki-asset-find-sys'
 
-Example: If the current page is 'Smalltalk programming' and the user select the
-file 'extendingClasses-number1.gst' it will open the file below with Emacs.
-
- - Smalltalk programming/'extendingClasses-number1.gst"
-  (interactive)
-  (org-wiki--asset-helm-selection #'find-file))
-
-(defun org-wiki-asset-find-sys ()
-  "Open a menu to select an asset file of current page and open it with system's app.
-Example: If the current page is 'Smalltalk programming' and the
-user select the file 'numerical-methods-in-smalltalk.pdf' it will
-be opened with the default system's application like Foxit PDF or
-Okular reader."
-  (interactive)
-  (org-wiki--asset-helm-selection #'org-wiki-xdg-open))
+;; (defun org-wiki-asset-insert-block ()
+  ;; "Insert code block with contents of some asset file."
+  ;; (interactive)
+  ;; (org-wiki--asset-helm-selection
+    ;; (lambda (file)
+      ;; (save-excursion
+        ;; (insert (concat " - File: " (org-make-link-string (concat "file:" file))))
+        ;; (insert "\n\n")
+        ;; (insert "#+BEGIN_SRC text\n")
+        ;; (insert "  ")
+        ;; (insert (replace-regexp-in-string
+                 ;; "\n"
+                 ;; "\n  "
+                 ;; (with-temp-buffer
+                   ;; (insert-file-contents file)
+                   ;; (buffer-substring-no-properties (point-min) (point-max)))))
+        ;; (insert "\n#+END_SRC")
+        ;; ))))
+;;
+;;
+;; (defun org-wiki-asset-find-file ()
+  ;; "Open a menu to select an asset file of current page and open it with Emacs.
+;; Note: see 'org-wiki-asset-find-sys'
+;;
+;; Example: If the current page is 'Smalltalk programming' and the user select the
+;; file 'extendingClasses-number1.gst' it will open the file below with Emacs.
+;;
+ ;; - Smalltalk programming/'extendingClasses-number1.gst"
+  ;; (interactive)
+  ;; (org-wiki--asset-helm-selection #'find-file))
+;;
+;; (defun org-wiki-asset-find-sys ()
+  ;; "Open a menu to select an asset file of current page and open it with system's app.
+;; Example: If the current page is 'Smalltalk programming' and the
+;; user select the file 'numerical-methods-in-smalltalk.pdf' it will
+;; be opened with the default system's application like Foxit PDF or
+;; Okular reader."
+  ;; (interactive)
+  ;; (org-wiki--asset-helm-selection #'org-wiki-xdg-open))
 
 (defun org-wiki-asset-create ()
   "Prompts the user for a file name that doesn't exist yet and insert it at point.
@@ -745,24 +746,24 @@ this file:Linux/scriptDemoQT.py .
                )))))
 
 
-(defun org-wiki-asset-download-insert1 ()
-  "Download a file from a URL in the clibpoard and inserts a link wiki-asset-sys:.
-Note: This function is synchronous and blocks Emacs. If Emacs is stuck
-type C-g to cancel the download."
-  (interactive)
-  (org-wiki--asset-download-hof
-   (lambda (pagename output-file)
-     (save-excursion (insert (format "[[wiki-asset-sys:%s;%s][%s]]"
-                                     pagename output-file output-file))))))
-
-(defun org-wiki-asset-download-insert2 ()
-  "Download a file from a URL in the clibpoard and inserts a link file:<page>/<asset-file>.
-Note: This function is synchronous and blocks Emacs. If Emacs gets frozen type C-g
-to cancel the download."
-  (interactive)
-  (org-wiki--asset-download-hof
-   (lambda (pagename output-file)
-     (save-excursion (insert (format "file:%s/%s" pagename output-file ))))))
+;; (defun org-wiki-asset-download-insert1 ()
+  ;; "Download a file from a URL in the clibpoard and inserts a link wiki-asset-sys:.
+;; Note: This function is synchronous and blocks Emacs. If Emacs is stuck
+;; type C-g to cancel the download."
+  ;; (interactive)
+  ;; (org-wiki--asset-download-hof
+   ;; (lambda (pagename output-file)
+     ;; (save-excursion (insert (format "[[wiki-asset-sys:%s;%s][%s]]"
+                                     ;; pagename output-file output-file))))))
+;;
+;; (defun org-wiki-asset-download-insert2 ()
+  ;; "Download a file from a URL in the clibpoard and inserts a link file:<page>/<asset-file>.
+;; Note: This function is synchronous and blocks Emacs. If Emacs gets frozen type C-g
+;; to cancel the download."
+  ;; (interactive)
+  ;; (org-wiki--asset-download-hof
+   ;; (lambda (pagename output-file)
+     ;; (save-excursion (insert (format "file:%s/%s" pagename output-file ))))))
 
 (defun org-wiki-helm ()
   "Browser the wiki files using helm."
@@ -887,19 +888,19 @@ to cancel the download."
   (interactive)
   (org-wiki-xdg-open org-wiki-location))
 
-(defun org-wiki-asset-open ()
-  "Open asset directory of current page with system's default file manager."
-  (interactive)
-  (org-wiki--assets-buffer-make-dir)
-  (org-wiki-xdg-open (file-name-base (buffer-file-name))))
-
-(defun org-wiki-assets-helm ()
-  "Open the assets directory of a wiki page."
-  (interactive)
-  (org-wiki--helm-selection
-   (lambda (page)
-     (org-wiki--assets-make-dir page)
-     (dired (org-wiki--assets-get-dir page)))))
+;; (defun org-wiki-asset-open ()
+  ;; "Open asset directory of current page with system's default file manager."
+  ;; (interactive)
+  ;; (org-wiki--assets-buffer-make-dir)
+  ;; (org-wiki-xdg-open (file-name-base (buffer-file-name))))
+;;
+;; (defun org-wiki-assets-helm ()
+  ;; "Open the assets directory of a wiki page."
+  ;; (interactive)
+  ;; (org-wiki--helm-selection
+   ;; (lambda (page)
+     ;; (org-wiki--assets-make-dir page)
+     ;; (dired (org-wiki--assets-get-dir page)))))
 
 
 (defun org-wiki-make-org-publish-plist (org-exporter)
