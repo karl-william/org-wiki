@@ -145,9 +145,9 @@ You can toggle read-only mode with M-x read-only-mode or C-x C-q."
 
 
 (defcustom org-wiki-template
-  (concat "[[wiki:index][Index]]\n\n"
-          "#+TITLE: %n\n"
-          "#+AUTHOR:"
+  (concat "[[wiki:index][Index]]"
+          ;; "#+TITLE: %n\n"
+          ;; "#+AUTHOR:"
           ;; "#+DESCRIPTION:\n"
           ;; "#+KEYWORDS:\n"
           ;; "#+STARTUP:  content\n"
