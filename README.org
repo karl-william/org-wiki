@@ -7,7 +7,10 @@
 #+HTML_HEAD: <link href="theme/org-nav-theme.css" rel="stylesheet"> 
 #+HTML_HEAD: <script src="theme/org-nav-theme.js"></script>
 
-
+* kwr-wiki
+This was forked to add extra functionality more pertinent for my own uses.
+** Removed unnecessary functionality such as support for images.
+** Added "quick-links" and support for pdf integration.
 * Org-wiki 
 ** Overview 
 

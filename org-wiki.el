@@ -145,7 +145,7 @@ You can toggle read-only mode with M-x read-only-mode or C-x C-q."
 
 
 (defcustom org-wiki-template
-  (concat "[[wiki:index][Index]]"
+  (concat "[[wiki:index][Index]]\n"
           ;; "#+TITLE: %n\n"
           ;; "#+AUTHOR:"
           ;; "#+DESCRIPTION:\n"
@@ -340,14 +340,14 @@ Example: '(\"Linux\" \"BSD\" \"Bash\"  \"Binary_Files\")"
     ;; (message "Error: Not in a wiki page.")))
 ;;
 ;;
-;; (defun org-wiki--is-buffer-in (b)
-  ;; "Check if buffer is an org-wiki buffer.
-;; It returns true (non nil) if buffer directory is a subdirectory of
-;; org-wiki-location."
-  ;; (string-prefix-p
-   ;; (expand-file-name org-wiki-location)
-   ;; (expand-file-name (with-current-buffer b
-                       ;; default-directory))))
+(defun org-wiki--is-buffer-in (b)
+  "Check if buffer is an org-wiki buffer.
+It returns true (non nil) if buffer directory is a subdirectory of
+org-wiki-location."
+  (string-prefix-p
+   (expand-file-name org-wiki-location)
+   (expand-file-name (with-current-buffer b
+                       default-directory))))
 
 ;;=============== Org-mode custom protocol ===============;;
 ;;
@@ -382,7 +382,8 @@ Will open the the wiki file Linux.org in
                ;; Save current page buffer
                (save-buffer)
                ;; Create assets directory
-               (org-wiki--assets-make-dir pagename))
+               ;; (org-wiki--assets-make-dir pagename) ;;; kwr removed
+               )
 
       ;; Action executed if file exists.
       (if org-wiki-default-read-only
@@ -1063,61 +1064,61 @@ Note: This command requires Python3 installed."
                 (message "Server stopped.")
                 ))))
 
-(defun org-wiki-paste-image ()  
-  "Paste a image asking the user for the file name."
-  (interactive)
-  (let* ((dir   (file-name-as-directory
-                   (file-name-base
-                    (buffer-file-name))))
-           (image-name (read-string "Image name: " )))
-    (org-wiki--assets-make-dir dir)
-    (insert "#+CAPTION: ")
-    (save-excursion
-      (insert image-name)
-      (insert "\n")
-      (insert
-       (org-make-link-string
-        (concat "file:"
-                (string-trim
-                 (shell-command-to-string
-                  (mapconcat #'identity
-                             `("java"
-                               "-jar"
-                               ;;,(expand-file-name "~/bin/Clip.jar")
-                               ,(expand-file-name  org-wiki-clip-jar-path)
-                               "--name"
-                               ,(concat "\"" image-name "\"")
-                               ,(concat "\"" dir "\"")
-                               )
-                             " "
-                             )))))))))
-
-(defun org-wiki-paste-image-uuid ()
-  "Paste a image with automatic generated name (uuid)."
-  (interactive)
-  (let* ((dir   (file-name-base
-                    (buffer-file-name))))
-    
-    (org-wiki--assets-make-dir dir)
-
-    (insert "#+CAPTION: ")
-    (save-excursion
-      (insert "\n")
-      (insert
-       (org-make-link-string
-        (concat "file:"
-                  (string-trim
-                   (shell-command-to-string
-                    (mapconcat #'identity
-                               `("java"
-                                 "-jar"
-                                        ;;,(expand-file-name "~/bin/Clip.jar")
-                                 ,(expand-file-name  org-wiki-clip-jar-path)
-                                 "--uuid"
-                                 ,(concat "\"" dir "\""))
-
-                               " "
-                               )))))))))
+;; (defun org-wiki-paste-image ()
+  ;; "Paste a image asking the user for the file name."
+  ;; (interactive)
+  ;; (let* ((dir   (file-name-as-directory
+                   ;; (file-name-base
+                    ;; (buffer-file-name))))
+           ;; (image-name (read-string "Image name: " )))
+    ;; (org-wiki--assets-make-dir dir)
+    ;; (insert "#+CAPTION: ")
+    ;; (save-excursion
+      ;; (insert image-name)
+      ;; (insert "\n")
+      ;; (insert
+       ;; (org-make-link-string
+        ;; (concat "file:"
+                ;; (string-trim
+                 ;; (shell-command-to-string
+                  ;; (mapconcat #'identity
+                             ;; `("java"
+                               ;; "-jar"
+                               ;; ;;,(expand-file-name "~/bin/Clip.jar")
+                               ;; ,(expand-file-name  org-wiki-clip-jar-path)
+                               ;; "--name"
+                               ;; ,(concat "\"" image-name "\"")
+                               ;; ,(concat "\"" dir "\"")
+                               ;; )
+                             ;; " "
+                             ;; )))))))))
+;;
+;; (defun org-wiki-paste-image-uuid ()
+  ;; "Paste a image with automatic generated name (uuid)."
+  ;; (interactive)
+  ;; (let* ((dir   (file-name-base
+                    ;; (buffer-file-name))))
+   ;;
+    ;; (org-wiki--assets-make-dir dir)
+;;
+    ;; (insert "#+CAPTION: ")
+    ;; (save-excursion
+      ;; (insert "\n")
+      ;; (insert
+       ;; (org-make-link-string
+        ;; (concat "file:"
+                  ;; (string-trim
+                   ;; (shell-command-to-string
+                    ;; (mapconcat #'identity
+                               ;; `("java"
+                                 ;; "-jar"
+                                        ;; ;;,(expand-file-name "~/bin/Clip.jar")
+                                 ;; ,(expand-file-name  org-wiki-clip-jar-path)
+                                 ;; "--uuid"
+                                 ;; ,(concat "\"" dir "\""))
+;;
+                               ;; " "
+                               ;; )))))))))
 
 
 ;; Custom Minor Mode
