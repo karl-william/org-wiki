@@ -59,7 +59,7 @@
   :group 'tools
   )
 
-(defcustom org-wiki-location-list '("~/Org/wik")
+(defcustom org-wiki-location-list '("~/org/wik")
   "List of org-wiki root directories"
   :type  '(repeat directory)
   :group 'org-wiki
